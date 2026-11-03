@@ -71,7 +71,8 @@ class ConnectivityDetector:
                 if self._is_virtual(name):
                     continue
                 for addr in addr_list:
-                    if addr.family == socket.AF_INET and addr.address and not addr.address.startswith("127."):
+                    # 169.254.x.x is self-assigned by Windows on an unplugged/unjoined adapter: not a network
+                    if addr.family == socket.AF_INET and addr.address and not addr.address.startswith(("127.", "169.254.")):
                         return True
         except Exception:
             pass
