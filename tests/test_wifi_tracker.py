@@ -1,3 +1,4 @@
+import socket
 import time
 import unittest
 from unittest import mock
@@ -22,6 +23,15 @@ class DetectorTest(unittest.TestCase):
         d = ConnectivityDetector()
         self.assertTrue(d._is_virtual("vEthernet (WSL)"))
         self.assertFalse(d._is_virtual("Wi-Fi"))
+
+    def test_self_assigned_address_is_not_a_network(self):
+        addr = lambda ip: mock.Mock(family=socket.AF_INET, address=ip)
+        d = ConnectivityDetector()
+        with mock.patch("psutil.net_if_stats", return_value={}):
+            with mock.patch("psutil.net_if_addrs", return_value={"Ethernet": [addr("169.254.10.2")]}):
+                self.assertFalse(d._has_active_network())
+            with mock.patch("psutil.net_if_addrs", return_value={"Ethernet": [addr("192.168.1.5")]}):
+                self.assertTrue(d._has_active_network())
 
     def test_internet_check_fails_cleanly(self):
         with mock.patch("socket.create_connection", side_effect=OSError):
