@@ -1,4 +1,4 @@
 # Exact versions (tested together); Dependabot proposes upgrades with CI checking them.
 pystray==0.19.5
-Pillow==12.2.0
+Pillow==13.0.0
 psutil==7.2.2
